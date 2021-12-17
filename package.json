@@ -1,0 +1,26 @@
+{
+  "name": "helix-test",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "license": "Apache License 2.0",
+  "devDependencies": {
+    "@babel/core": "7.13.10",
+    "@babel/eslint-parser": "7.13.10",
+    "chai": "4.2.0",
+    "eslint": "7.15.0",
+    "eslint-config-airbnb-base": "14.2.0",
+    "eslint-plugin-import": "2.22.1",
+    "fs-extra": "9.0.1",
+    "jsdom": "16.5.0",
+    "karma": "^6.3.4",
+    "karma-chai": "0.1.0",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-mocha": "2.0.1",
+    "karma-mocha-reporter": "2.2.5",
+    "mocha": "8.2.1"
+  }
+}
