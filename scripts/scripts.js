@@ -12,8 +12,6 @@
 
 /* eslint-disable no-unused-vars */
 
-import ims from './ims.js';
-
 /**
  * Loads a CSS file.
  * @param {string} href The path to the CSS file
@@ -934,21 +932,7 @@ async function loadEager() {
  */
 async function loadLazy() {
   // post LCP actions go here
-
-  await ims();
-
-  /* load gnav */
-  // const header = document.querySelector('header')
-  // const gnavPath =
-  //   getMetadata('gnav') || `${getRootPath()}/gnav`
-  // header.setAttribute('data-block-name', 'gnav')
-  // header.setAttribute('data-gnav-source', gnavPath)
-  // loadBlock(header)
-
-  // const main = document.querySelector('main')
-  // loadBlocks(main)
-  // loadCSS('/styles/lazy-styles.css')
-  // addFavIcon('/styles/favicon.svg')
+  loadScript('./scripts/lazy.js', null, 'module');
 }
 
 /**

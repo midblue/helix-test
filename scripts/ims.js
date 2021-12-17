@@ -16,26 +16,7 @@ import {
   loadScript,
 } from './scripts.js';
 
-async function awaitIMSLoad() {
-  loadScript(
-    'https://auth.services.adobe.com/imslib/imslib.min.js',
-  );
-
-  return new Promise((resolve) => {
-    if (window.adobeIMS) {
-      resolve();
-      return;
-    }
-    const interval = setInterval(() => {
-      if (window.adobeIMS) {
-        clearInterval(interval);
-        resolve();
-      }
-    }, 100);
-  });
-}
-
-export default async function ims() {
+export default function ims() {
   window.adobeid = {
     client_id: 'bizweb', // todo change
     scope: 'AdobeID,openid,gnav',
@@ -44,18 +25,21 @@ export default async function ims() {
     environment: getHelixEnv().ims,
     useLocalStorage: false,
     onReady: (res) => {
-      debug(`saved adobe ID loaded: ${res}`);
+      debug(`existing adobe ID: ${res}`);
     },
   };
 
-  await awaitIMSLoad();
-
-  const accessToken = window.adobeIMS.getAccessToken();
-  if (accessToken) {
-    debug(`access token: ${accessToken}`);
-  } else {
-    debug('no access token');
-    // eslint-disable-next-line no-restricted-globals, no-alert
-    if (confirm('No access token found. Attempt IMS login?')) window.adobeIMS.signIn();
-  }
+  loadScript(
+    'https://auth.services.adobe.com/imslib/imslib.min.js',
+    () => {
+      const accessToken = window.adobeIMS.getAccessToken();
+      if (accessToken) {
+        debug(`access token: ${accessToken}`);
+      } else {
+        debug('no access token');
+        // eslint-disable-next-line no-restricted-globals, no-alert
+        if (confirm('No access token found. Attempt IMS login?')) window.adobeIMS.signIn();
+      }
+    },
+  );
 }
