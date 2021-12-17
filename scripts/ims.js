@@ -44,7 +44,7 @@ export default async function ims() {
     environment: getHelixEnv().ims,
     useLocalStorage: false,
     onReady: (res) => {
-      debug(`ims ready: ${res}`);
+      debug(`saved adobe ID loaded: ${res}`);
     },
   };
 
@@ -55,6 +55,7 @@ export default async function ims() {
     debug(`access token: ${accessToken}`);
   } else {
     debug('no access token');
-    // window.adobeIMS.signIn();
+    // eslint-disable-next-line no-restricted-globals, no-alert
+    if (confirm('No access token found. Attempt IMS login?')) window.adobeIMS.signIn();
   }
 }
