@@ -9,10 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-
-import ims from './ims.js';
-
-await ims();
+import { createTag, loadBlocks, loadCSS } from './scripts.js';
 
 /* load gnav */
 // const header = document.querySelector('header')
@@ -22,7 +19,17 @@ await ims();
 // header.setAttribute('data-gnav-source', gnavPath)
 // loadBlock(header)
 
-// const main = document.querySelector('main')
-// loadBlocks(main)
-// loadCSS('/styles/lazy-styles.css')
-// addFavIcon('/styles/favicon.svg')
+const main = document.querySelector('main');
+loadBlocks(main);
+loadCSS('/styles/lazy-styles.css');
+
+const footer = document.querySelector('footer');
+footer.innerHTML = `
+  <div class="bold">Test Result Catalog</div>
+  <div class="footersub">
+    © 2021 Adobe. All rights reserved <span class="spacer"> / </span> 
+    <a href="#">Adobe Confidential</a> <span class="spacer"> / </span> 
+    <a href="#">See all corporate policies</a> <span class="spacer"> / </span> 
+    <a href="#">Terms of Use</a> <span class="spacer"> / </span> 
+    Powered by <a href="#">Project Helix</a> and maintained by the <a href="#">Creative Cloud Growth Team</a>
+  </div>`;

@@ -1,0 +1,7 @@
+.hero {
+  width: 100%;
+  min-height: 400px;
+  background-color: #bbb;
+  margin: 0;
+  max-width: 100%;
+}

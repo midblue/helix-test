@@ -1,0 +1,38 @@
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  margin: 0 auto;
+  padding: 40px 0;
+  max-width: calc(min(1200px, 96vw));
+  color: white;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+footer:before {
+  content: '';
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: -100vw;
+  width: 300vw;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+}
+footer .footersub {
+  font-size: 0.7rem;
+  color: #ddd;
+}
+
+footer a {
+  color: inherit;
+  text-decoration: underline;
+}
+footer a:hover {
+  color: white;
+}
+
+footer .spacer {
+  margin: 0 0.5em;
+}

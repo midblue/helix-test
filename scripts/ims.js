@@ -12,34 +12,34 @@
 
 import {
   debug,
-  getHelixEnv,
+  // getHelixEnv,
   loadScript,
 } from './scripts.js';
 
 export default function ims() {
-  window.adobeid = {
-    client_id: 'bizweb', // todo change
-    scope: 'AdobeID,openid,gnav',
-    locale: 'en_US',
-    autoValidateToken: true,
-    environment: getHelixEnv().ims,
-    useLocalStorage: false,
-    onReady: (res) => {
-      debug(`existing adobe ID: ${res}`);
-    },
-  };
 
-  loadScript(
-    'https://auth.services.adobe.com/imslib/imslib.min.js',
-    () => {
-      const accessToken = window.adobeIMS.getAccessToken();
-      if (accessToken) {
-        debug(`access token: ${accessToken}`);
-      } else {
-        debug('no access token');
-        // eslint-disable-next-line no-restricted-globals, no-alert
-        if (confirm('No access token found. Attempt IMS login?')) window.adobeIMS.signIn();
-      }
-    },
-  );
+  // window.adobeid = {
+  //   client_id: 'bizweb', // todo change
+  //   scope: 'AdobeID,openid,gnav',
+  //   locale: 'en_US',
+  //   autoValidateToken: true,
+  //   environment: 'stg1', // getHelixEnv().ims, // 'stg1'
+  //   useLocalStorage: false,
+  //   onReady: (res) => {
+  //     debug(`existing adobe ID: ${res}`);
+  //     const accessToken = window.adobeIMS.getAccessToken();
+  //     if (accessToken) {
+  //       debug(`access token: ${accessToken}`);
+  //       // check email address (res.email)
+  //     } else {
+  //       debug('no access token');
+  //       // eslint-disable-next-line no-restricted-globals, no-alert
+  //       // if (confirm('No access token found. Attempt IMS login?')) window.adobeIMS.signIn();
+  //     }
+  //   },
+  // };
+
+  // loadScript(
+  //   'https://auth.services.adobe.com/imslib/imslib.min.js',
+  // );
 }

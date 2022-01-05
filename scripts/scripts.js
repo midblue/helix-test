@@ -12,14 +12,15 @@
 
 /* eslint-disable no-unused-vars */
 
+import ims from './ims.js';
+import { loadTestData } from './testData.js';
+
 /**
  * Loads a CSS file.
  * @param {string} href The path to the CSS file
  */
 export function loadCSS(href, callback) {
-  if (
-    !document.querySelector(`head > link[href="${href}"]`)
-  ) {
+  if (!document.querySelector(`head > link[href="${href}"]`)) {
     const link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
     link.setAttribute('href', href);
@@ -48,11 +49,7 @@ export function getRootPath() {
  */
 export function getMetadata(name) {
   const attr = name && name.includes(':') ? 'property' : 'name';
-  const meta = [
-    ...document.head.querySelectorAll(
-      `meta[${attr}="${name}"]`,
-    ),
-  ]
+  const meta = [...document.head.querySelectorAll(`meta[${attr}="${name}"]`)]
     .map((el) => el.content)
     .join(', ');
   return meta;
@@ -81,9 +78,7 @@ export function getHelixEnv() {
   };
   const env = envs[envName];
 
-  const overrideItem = sessionStorage.getItem(
-    'helix-env-overrides',
-  );
+  const overrideItem = sessionStorage.getItem('helix-env-overrides');
   if (overrideItem) {
     const overrides = JSON.parse(overrideItem);
     const keys = Object.keys(overrides);
@@ -116,10 +111,7 @@ export function debug(message) {
 export function addPublishDependencies(url) {
   const urls = Array.isArray(url) ? url : [url];
   window.hlx = window.hlx || {};
-  if (
-    window.hlx.dependencies
-    && Array.isArray(window.hlx.dependencies)
-  ) {
+  if (window.hlx.dependencies && Array.isArray(window.hlx.dependencies)) {
     window.hlx.dependencies.concat(urls);
   } else {
     window.hlx.dependencies = urls;
@@ -132,9 +124,7 @@ export function addPublishDependencies(url) {
  * @returns {string} The class name
  */
 export function toClassName(name) {
-  return name && typeof name === 'string'
-    ? name.toLowerCase().replace(/[^0-9a-z]/gi, '-')
-    : '';
+  return name && typeof name === 'string' ? name.toLowerCase().replace(/[^0-9a-z]/gi, '-') : '';
 }
 
 /**
@@ -153,6 +143,49 @@ function wrapSections(sections) {
 }
 
 /**
+ * Creates a tag with the given name and attributes.
+ * @param {string} name The tag name
+ * @param {Record<string,string>} attrs An object containing the attributes
+ * @returns The new tag
+ */
+export function createTag(name, attrs, options = { parent: null, prepend: false, innerHTML: '' }) {
+  if (typeof options !== 'object') {
+    debug('Invalid options passed to createTag');
+    return false;
+  }
+  const el = document.createElement(name);
+  if (typeof attrs === 'object') {
+    Object.entries(attrs).forEach(([key, value]) => {
+      el.setAttribute(key, value);
+    });
+  }
+  if (options.parent) {
+    if (options.prepend) options.parent.prepend(el);
+    else options.parent.appendChild(el);
+  }
+  if (options.innerHTML) el.innerHTML = options.innerHTML;
+  return el;
+}
+
+export function createIcon(name) {
+  const icon = createTag('img', { class: `icon icon-${name}`, src: `/icons/${name}.svg` });
+  return icon;
+}
+
+const skipWords = ['a', 'an', 'the', 'of', 'in', 'to', 'per'];
+export function capitalize(string = '', firstOnly = false) {
+  return (string || '')
+    .toLowerCase()
+    .split(' ')
+    .map((s, index) => {
+      if (skipWords.includes(s) && index > 0) return s;
+      if (firstOnly && index > 0) return s;
+      return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+    })
+    .join(' ');
+}
+
+/**
  * Decorates a block.
  * @param {Element} block The block element
  */
@@ -163,14 +196,10 @@ export function decorateBlock(block) {
   if (!blockName) return;
   const section = block.closest('.section-wrapper');
   if (section) {
-    section.classList.add(
-      `${blockName}-container`.replace(/--/g, '-'),
-    );
+    section.classList.add(`${blockName}-container`.replace(/--/g, '-'));
   }
   const blockWithVariants = blockName.split('--');
-  const shortBlockName = trimDashes(
-    blockWithVariants.shift(),
-  );
+  const shortBlockName = trimDashes(blockWithVariants.shift());
   const variants = blockWithVariants.map((v) => trimDashes(v));
   block.classList.add(shortBlockName);
   block.classList.add(...variants);
@@ -185,9 +214,7 @@ export function decorateBlock(block) {
  * @param {any} content two dimensional array or string or object of content
  */
 function buildBlock(blockName, content) {
-  const table = Array.isArray(content)
-    ? content
-    : [[content]];
+  const table = Array.isArray(content) ? content : [[content]];
   const blockEl = document.createElement('div');
   // build image block nested div structure
   blockEl.classList.add(blockName);
@@ -236,8 +263,7 @@ function removeStylingFromImages(mainEl) {
 function getImageCaption(picture) {
   const parentEl = picture.parentNode;
   const parentSiblingEl = parentEl.nextElementSibling;
-  return parentSiblingEl
-    && parentSiblingEl.firstChild.nodeName === 'EM'
+  return parentSiblingEl && parentSiblingEl.firstChild.nodeName === 'EM'
     ? parentSiblingEl
     : undefined;
 }
@@ -248,23 +274,13 @@ function getImageCaption(picture) {
  */
 function buildImageBlocks(mainEl) {
   // select all non-featured, default (non-images block) images
-  const imgEls = [
-    ...mainEl.querySelectorAll(
-      ':scope > div > p > picture',
-    ),
-  ];
+  const imgEls = [...mainEl.querySelectorAll(':scope > div > p > picture')];
   imgEls.forEach((imgEl) => {
     const parentEl = imgEl.parentNode;
     const imagesBlockEl = buildBlock('images', {
-      elems: [
-        parentEl.cloneNode(true),
-        getImageCaption(imgEl),
-      ],
+      elems: [parentEl.cloneNode(true), getImageCaption(imgEl)],
     });
-    parentEl.parentNode.insertBefore(
-      imagesBlockEl,
-      parentEl,
-    );
+    parentEl.parentNode.insertBefore(imagesBlockEl, parentEl);
     parentEl.remove();
   });
 }
@@ -273,37 +289,25 @@ function buildTagHeader(mainEl) {
   const div = mainEl.querySelector('div');
   const h1 = mainEl.querySelector('h1');
   const picture = mainEl.querySelector('picture');
-  const tagHeaderBlockEl = buildBlock('tag-header', [
-    [h1],
-    [{ elems: [picture.closest('p')] }],
-  ]);
+  const tagHeaderBlockEl = buildBlock('tag-header', [[h1], [{ elems: [picture.closest('p')] }]]);
   div.prepend(tagHeaderBlockEl);
 }
 
 function buildArticleFeed(mainEl, type) {
   const div = document.createElement('div');
-  const title = mainEl
-    .querySelector('h1')
-    .textContent.trim();
-  const articleFeedEl = buildBlock('article-feed', [
-    [type, title],
-  ]);
+  const title = mainEl.querySelector('h1').textContent.trim();
+  const articleFeedEl = buildBlock('article-feed', [[type, title]]);
   div.append(articleFeedEl);
   mainEl.append(div);
 }
 
-function buildArticleHeader(mainEl) {
-}
+function buildArticleHeader(mainEl) {}
 
 function buildTagsBlock(mainEl) {
   const tags = getMetadata('article:tag');
   if (tags) {
-    const tagsBlock = buildBlock('tags', [
-      [`<p>${tags}</p>`],
-    ]);
-    const recBlock = mainEl.querySelector(
-      '.recommended-articles',
-    );
+    const tagsBlock = buildBlock('tags', [[`<p>${tags}</p>`]]);
+    const recBlock = mainEl.querySelector('.recommended-articles');
     if (recBlock) {
       recBlock.parentNode.insertBefore(tagsBlock, recBlock);
     } else {
@@ -317,9 +321,7 @@ function buildTagsBlock(mainEl) {
  * @param {Element} main The container element
  */
 function decorateBlocks(main) {
-  main
-    .querySelectorAll('div.section-wrapper > div > div')
-    .forEach((block) => decorateBlock(block));
+  main.querySelectorAll('div.section-wrapper > div > div').forEach((block) => decorateBlock(block));
 }
 
 /**
@@ -329,10 +331,7 @@ function decorateBlocks(main) {
 function buildAutoBlocks(mainEl) {
   removeStylingFromImages(mainEl);
   try {
-    if (
-      getMetadata('publication-date')
-      && !mainEl.querySelector('.article-header')
-    ) {
+    if (getMetadata('publication-date') && !mainEl.querySelector('.article-header')) {
       buildArticleHeader(mainEl);
       buildTagsBlock(mainEl);
     }
@@ -356,10 +355,7 @@ function unwrapBlock(block) {
   const postBlockSection = document.createElement('div');
   const nextSection = section.nextSibling;
   section.parentNode.insertBefore(blockSection, nextSection);
-  section.parentNode.insertBefore(
-    postBlockSection,
-    nextSection,
-  );
+  section.parentNode.insertBefore(postBlockSection, nextSection);
 
   let appendTo;
   els.forEach((el) => {
@@ -381,26 +377,18 @@ function unwrapBlock(block) {
 }
 
 function splitSections() {
-  document
-    .querySelectorAll('main > div > div')
-    .forEach((block) => {
-      const blocksToSplit = [
-        'article-header',
-        'article-feed',
-        'recommended-articles',
-      ];
-      if (blocksToSplit.includes(block.className)) {
-        unwrapBlock(block);
-      }
-    });
+  document.querySelectorAll('main > div > div').forEach((block) => {
+    const blocksToSplit = ['article-header', 'article-feed', 'recommended-articles'];
+    if (blocksToSplit.includes(block.className)) {
+      unwrapBlock(block);
+    }
+  });
 }
 
 function removeEmptySections() {
-  document
-    .querySelectorAll('main > div:empty')
-    .forEach((div) => {
-      div.remove();
-    });
+  document.querySelectorAll('main > div:empty').forEach((div) => {
+    div.remove();
+  });
 }
 
 /**
@@ -425,19 +413,13 @@ export function buildFigure(blockEl) {
   figEl.classList.add('figure');
   // content is picture only, no caption or link
   if (blockEl.firstChild) {
-    if (
-      blockEl.firstChild.nodeName === 'PICTURE'
-      || blockEl.firstChild.nodeName === 'VIDEO'
-    ) {
+    if (blockEl.firstChild.nodeName === 'PICTURE' || blockEl.firstChild.nodeName === 'VIDEO') {
       figEl.append(blockEl.firstChild);
     } else if (blockEl.firstChild.nodeName === 'P') {
       const pEls = Array.from(blockEl.children);
       pEls.forEach((pEl) => {
         if (pEl.firstChild) {
-          if (
-            pEl.firstChild.nodeName === 'PICTURE'
-            || pEl.firstChild.nodeName === 'VIDEO'
-          ) {
+          if (pEl.firstChild.nodeName === 'PICTURE' || pEl.firstChild.nodeName === 'VIDEO') {
             figEl.append(pEl.firstChild);
           } else if (pEl.firstChild.nodeName === 'EM') {
             const figCapEl = buildCaption(pEl);
@@ -468,25 +450,16 @@ export async function loadBlock(block, eager = false) {
   if (!block.getAttribute('data-block-status')) {
     block.setAttribute('data-block-status', 'loading');
     const blockName = block.getAttribute('data-block-name');
+    block.classList.add(blockName);
     try {
       const cssLoaded = new Promise((resolve) => {
-        loadCSS(
-          `/blocks/${blockName}/${blockName}.css`,
-          resolve,
-        );
+        loadCSS(`/blocks/${blockName}/${blockName}.css`, resolve);
       });
       const decorationComplete = new Promise((resolve) => {
         const runBlock = async () => {
-          const mod = await import(
-            `/blocks/${blockName}/${blockName}.js`
-          );
+          const mod = await import(`/blocks/${blockName}/${blockName}.js`);
           if (mod.default) {
-            await mod.default(
-              block,
-              blockName,
-              document,
-              eager,
-            );
+            await mod.default(block, blockName, document, eager);
           }
           resolve();
         };
@@ -505,7 +478,7 @@ export async function loadBlock(block, eager = false) {
  * Loads JS and CSS for all blocks in a container element.
  * @param {Element} main The container element
  */
-async function loadBlocks(main) {
+export async function loadBlocks(main) {
   main
     .querySelectorAll('div.section-wrapper > div > .block')
     .forEach(async (block) => loadBlock(block));
@@ -554,33 +527,25 @@ export function readBlockConfig(block) {
  */
 export function normalizeHeadings(el, allowedHeadings) {
   const allowed = allowedHeadings.map((h) => h.toLowerCase());
-  el.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(
-    (tag) => {
-      const h = tag.tagName.toLowerCase();
-      if (allowed.indexOf(h) === -1) {
-        // current heading is not in the allowed list -> try first to "promote" the heading
-        let level = parseInt(h.charAt(1), 10) - 1;
-        while (
-          allowed.indexOf(`h${level}`) === -1
-          && level > 0
-        ) {
-          level -= 1;
-        }
-        if (level === 0) {
-          // did not find a match -> try to "downgrade" the heading
-          while (
-            allowed.indexOf(`h${level}`) === -1
-            && level < 7
-          ) {
-            level += 1;
-          }
-        }
-        if (level !== 7) {
-          tag.outerHTML = `<h${level}>${tag.textContent}</h${level}>`;
+  el.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((tag) => {
+    const h = tag.tagName.toLowerCase();
+    if (allowed.indexOf(h) === -1) {
+      // current heading is not in the allowed list -> try first to "promote" the heading
+      let level = parseInt(h.charAt(1), 10) - 1;
+      while (allowed.indexOf(`h${level}`) === -1 && level > 0) {
+        level -= 1;
+      }
+      if (level === 0) {
+        // did not find a match -> try to "downgrade" the heading
+        while (allowed.indexOf(`h${level}`) === -1 && level < 7) {
+          level += 1;
         }
       }
-    },
-  );
+      if (level !== 7) {
+        tag.outerHTML = `<h${level}>${tag.textContent}</h${level}>`;
+      }
+    }
+  });
 }
 
 /**
@@ -594,27 +559,19 @@ export function createOptimizedPicture(
   src,
   alt = '',
   eager = false,
-  breakpoints = [
-    { media: '(min-width: 400px)', width: '2000' },
-    { width: '750' },
-  ],
+  breakpoints = [{ media: '(min-width: 400px)', width: '2000' }, { width: '750' }],
 ) {
   const url = new URL(src, window.location.href);
   const picture = document.createElement('picture');
   const { pathname } = url;
-  const ext = pathname.substring(
-    pathname.lastIndexOf('.') + 1,
-  );
+  const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
 
   // webp
   breakpoints.forEach((br) => {
     const source = document.createElement('source');
     if (br.media) source.setAttribute('media', br.media);
     source.setAttribute('type', 'image/webp');
-    source.setAttribute(
-      'srcset',
-      `${pathname}?width=${br.width}&format=webply&optimize=medium`,
-    );
+    source.setAttribute('srcset', `${pathname}?width=${br.width}&format=webply&optimize=medium`);
     picture.appendChild(source);
   });
 
@@ -623,17 +580,11 @@ export function createOptimizedPicture(
     if (i < breakpoints.length - 1) {
       const source = document.createElement('source');
       if (br.media) source.setAttribute('media', br.media);
-      source.setAttribute(
-        'srcset',
-        `${pathname}?width=${br.width}&format=${ext}&optimize=medium`,
-      );
+      source.setAttribute('srcset', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
       picture.appendChild(source);
     } else {
       const img = document.createElement('img');
-      img.setAttribute(
-        'src',
-        `${pathname}?width=${br.width}&format=${ext}&optimize=medium`,
-      );
+      img.setAttribute('src', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
       img.setAttribute('loading', eager ? 'eager' : 'lazy');
       img.setAttribute('alt', alt);
       picture.appendChild(img);
@@ -648,22 +599,14 @@ export function createOptimizedPicture(
  * @param {Element} article The article data to be placed in card.
  * @returns card Generated card
  */
-export function buildArticleCard(
-  article,
-  type = 'article',
-) {
-  const {
-    title, description, image, imageAlt, category,
-  } = article;
+export function buildArticleCard(article, type = 'article') {
+  const { title, description, image, imageAlt, category } = article;
 
   const path = article.path.split('.')[0];
 
-  const picture = createOptimizedPicture(
-    image,
-    imageAlt || title,
-    type === 'featured-article',
-    [{ width: '750' }],
-  );
+  const picture = createOptimizedPicture(image, imageAlt || title, type === 'featured-article', [
+    { width: '750' },
+  ]);
   const pictureTag = picture.outerHTML;
   const card = document.createElement('a');
   card.className = `${type}-card`;
@@ -673,11 +616,9 @@ export function buildArticleCard(
     </div>
     <div class="${type}-card-body">
       <p class="${type}-card-category">
-        <a href="${
-  window.location.origin
-}${getRootPath()}/tags/${toClassName(
-  category,
-)}">${category}</a>
+        <a href="${window.location.origin}${getRootPath()}/tags/${toClassName(
+    category,
+  )}">${category}</a>
       </p>
       <h3>${title}</h3>
       <p>${description}</p>
@@ -690,22 +631,13 @@ export function buildArticleCard(
  * @param {Element} main The main element
  */
 function decoratePictures(main) {
-  main
-    .querySelectorAll('img[src*="/media_"')
-    .forEach((img, i) => {
-      const newPicture = createOptimizedPicture(
-        img.src,
-        img.alt,
-        !i,
-      );
-      const picture = img.closest('picture');
-      if (picture) {
-        picture.parentElement.replaceChild(
-          newPicture,
-          picture,
-        );
-      }
-    });
+  main.querySelectorAll('img[src*="/media_"').forEach((img, i) => {
+    const newPicture = createOptimizedPicture(img.src, img.alt, !i);
+    const picture = img.closest('picture');
+    if (picture) {
+      picture.parentElement.replaceChild(newPicture, picture);
+    }
+  });
 }
 
 /**
@@ -737,18 +669,11 @@ export function addFavIcon(href) {
   link.rel = 'icon';
   link.type = 'image/svg+xml';
   link.href = href;
-  const existingLink = document.querySelector(
-    'head link[rel="icon"]',
-  );
+  const existingLink = document.querySelector('head link[rel="icon"]');
   if (existingLink) {
-    existingLink.parentElement.replaceChild(
-      link,
-      existingLink,
-    );
+    existingLink.parentElement.replaceChild(link, existingLink);
   } else {
-    document
-      .getElementsByTagName('head')[0]
-      .appendChild(link);
+    document.getElementsByTagName('head')[0].appendChild(link);
   }
 }
 
@@ -768,9 +693,7 @@ export async function fetchBlogArticleIndex() {
   if (window.blogIndex.complete) return window.blogIndex;
   const index = window.blogIndex;
   const resp = await fetch(
-    `${getRootPath()}/query-index.json?limit=${pageSize}&offset=${
-      index.offset
-    }`,
+    `${getRootPath()}/query-index.json?limit=${pageSize}&offset=${index.offset}`,
   );
   const json = await resp.json();
   const complete = json.limit + json.offset === json.total;
@@ -786,11 +709,9 @@ export async function fetchBlogArticleIndex() {
 export function makeLinkRelative(href) {
   const url = new URL(href);
   const host = url.hostname;
-  if (
-    host.endsWith('.page')
-    || host.endsWith('.live')
-    || host === 'business.adobe.com'
-  ) return `${url.pathname}${url.search}${url.hash}`;
+  if (host.endsWith('.page') || host.endsWith('.live') || host === 'business.adobe.com') {
+    return `${url.pathname}${url.search}${url.hash}`;
+  }
   return href;
 }
 
@@ -823,20 +744,13 @@ async function getMetadataJson(path) {
   const resp = await fetch(path.split('.')[0]);
   const text = await resp.text();
   const meta = {};
-  if (
-    resp.status === 200
-    && text
-    && text.includes('<head>')
-  ) {
-    const headStr = text
-      .split('<head>')[1]
-      .split('</head>')[0];
+  if (resp.status === 200 && text && text.includes('<head>')) {
+    const headStr = text.split('<head>')[1].split('</head>')[0];
     const head = document.createElement('head');
     head.innerHTML = headStr;
     const metaTags = head.querySelectorAll(':scope > meta');
     metaTags.forEach((metaTag) => {
-      const name = metaTag.getAttribute('name')
-        || metaTag.getAttribute('property');
+      const name = metaTag.getAttribute('name') || metaTag.getAttribute('property');
       const value = metaTag.getAttribute('content');
       if (meta[name]) {
         meta[name] += `, ${value}`;
@@ -892,6 +806,8 @@ function hideBody(id) {
  * loads everything needed to get to LCP.
  */
 async function loadEager() {
+  await ims();
+  await loadTestData();
   const main = document.querySelector('main');
   if (main) {
     const bodyHideStyleId = 'at-body-style';
@@ -907,10 +823,7 @@ async function loadEager() {
 
     const lcpBlocks = ['featured-article', 'article-header'];
     const block = document.querySelector('.block');
-    const hasLCPBlock = block
-      && lcpBlocks.includes(
-        block.getAttribute('data-block-name'),
-      );
+    const hasLCPBlock = block && lcpBlocks.includes(block.getAttribute('data-block-name'));
     if (hasLCPBlock) await loadBlock(block, true);
     const lcpCandidate = document.querySelector('main img');
     const loaded = {
@@ -945,14 +858,7 @@ function loadDelayed() {
   const usp = new URLSearchParams(window.location.search);
   const delayed = usp.get('delayed');
 
-  if (
-    !(
-      delayed === 'off'
-      || document.querySelector(
-        `head script[src="${delayedScript}"]`,
-      )
-    )
-  ) {
+  if (!(delayed === 'off' || document.querySelector(`head script[src="${delayedScript}"]`))) {
     let ms = 3500;
     const delay = usp.get('delay');
     if (delay) ms = +delay;
@@ -971,9 +877,7 @@ async function decoratePage() {
   loadDelayed();
 }
 window.hlx = window.hlx || {};
-window.hlx.lighthouse = new URLSearchParams(window.location.search).get(
-  'lighthouse',
-) === 'on';
+window.hlx.lighthouse = new URLSearchParams(window.location.search).get('lighthouse') === 'on';
 
 decoratePage();
 
@@ -981,10 +885,7 @@ function setHelixEnv(name, overrides) {
   if (name) {
     sessionStorage.setItem('helix-env', name);
     if (overrides) {
-      sessionStorage.setItem(
-        'helix-env-overrides',
-        JSON.stringify(overrides),
-      );
+      sessionStorage.setItem('helix-env-overrides', JSON.stringify(overrides));
     } else {
       sessionStorage.removeItem('helix-env-overrides');
     }
@@ -1007,9 +908,7 @@ function displayEnv() {
     if (document.referrer) {
       const url = new URL(document.referrer);
       if (window.location.hostname !== url.hostname) {
-        debug(
-          `external referrer detected: ${document.referrer}`,
-        );
+        debug(`external referrer detected: ${document.referrer}`);
       }
     }
   } catch (e) {
