@@ -38,7 +38,7 @@ export default async function init(blockEl) {
     </div>
     <div>
       <div class="fade sub">Lift</div>
-      <div>${testData.Lift * 100}%</div>
+      <div>${parseFloat(testData.Lift || 0) * 100}%</div>
     </div>
     <div>
       <div class="fade sub">KPI</div>
@@ -58,6 +58,96 @@ export default async function init(blockEl) {
   <div class="test-details-header">
     <h5>Test Details</h5>
     <a href="#" class="sub">View test charter ›</a>
+  </div>
+  `,
+    },
+  );
+
+  createTag(
+    'div',
+    { class: 'test-details-row' },
+    {
+      parent: blockEl,
+      innerHTML: `
+  <div class="test-details-row-box" style="flex-grow: 4;">
+    <h5>What</h5>
+    <div>
+      <div>
+        <div class="fade">Target Audience</div>
+        <div>${testData['Target Audience (subset of swimlane)']}</div>
+      </div>
+      <div>
+        <div class="fade">Surfaces</div>
+        <div>${testData.Surfaces}</div>
+      </div>
+      <div>
+        <div class="fade">Description</div>
+        <div>${testData.Description}</div>
+      </div>
+      <div>
+        <div class="fade">SKUs</div>
+        <div>${testData.SKUs}</div>
+      </div>
+      <div>
+        <div class="fade">Products</div>
+        <div>${testData.Products}</div>
+      </div>
+      <div>
+        <div class="fade">Catgory</div>
+        <div>${testData.Catgory}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-details-row-box" style="flex-grow: 1;">
+    <h5>When</h5>
+    <div>
+      <div>
+        <div class="fade">Dates Run</div>
+        <div>${testData['Dates Run']}</div>
+      </div>
+      <div>
+        <div class="fade">Results Read</div>
+        <div>${testData['Impact Read']}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-details-row-box" style="flex-grow: 2;">
+    <h5>Who</h5>
+    <div>
+      <div>
+        <div class="fade">PM</div>
+        <div>${testData.PM}</div>
+      </div>
+      <div>
+        <div class="fade">Copy</div>
+        <div>${testData.Copy}</div>
+      </div>
+    </div>
+  </div>
+  `,
+    },
+  );
+
+  createTag(
+    'div',
+    { class: 'test-details-row' },
+    {
+      parent: blockEl,
+      innerHTML: `
+  <div class="test-details-row-box" style="flex-grow: 4;">
+    <h5>UX</h5>
+    <div>
+      
+    </div>
+  </div>
+
+  <div class="test-details-row-box" style="flex-grow: 3;">
+    <h5>Research &amp; Insights</h5>
+    <div>
+     
+    </div>
   </div>
   `,
     },

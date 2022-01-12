@@ -39,3 +39,31 @@
   font-size: 1.3rem;
   margin: 0;
 }
+
+.test-details-row {
+  display: flex;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+.test-details-row-box {
+  flex-grow: 1;
+  padding: 0.5em 0;
+  border-top: 1px solid #ccc;
+}
+.test-details-row-box:not(:last-of-type) {
+  margin-right: 2em;
+}
+
+.test-details-row-box h5 {
+  opacity: 0.5;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.test-details-row-box > div {
+  opacity: 0.8;
+  display: grid;
+  gap: 1em;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}

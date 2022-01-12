@@ -1,6 +1,7 @@
-import { capitalize, createIcon, createTag, debug, loadBlock } from './scripts.js';
+import { addFavIcon, capitalize, createIcon, createTag, debug, loadBlock } from './scripts.js';
 
 export default function decoratePageCommonElements(pageEl) {
+  addFavIcon('/favicon.svg');
   pageEl.classList.add('page');
   const header = document.querySelector('header');
   header.setAttribute('data-block-name', 'header');

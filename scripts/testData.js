@@ -10,12 +10,15 @@
  * governing permissions and limitations under the License.
  */
 
+import { debug } from './scripts.js';
+
 export async function loadTestData() {
   const res = await fetch(`${window.location.origin}/importto.json`)
     .then((raw) => raw.json())
     .catch(() => []);
   const { data } = res;
   if (!data) {
+    debug('No test data found');
     window.testData = [];
     window.filteredTestData = [];
     return;
